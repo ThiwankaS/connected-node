@@ -13,7 +13,7 @@
  * Usage example:
  *   ESP32_APP_MAIN(HeartBeatApplication)
  */
-#define EPS32_APP_MAIN(App)                                                                 \
+#define ESP32_APP_MAIN(App)                                                                 \
     /* Force the compiler to use C linkage so ESP-IDF can locate the entry point */         \
     extern "C" void app_main(void) {                                                        \
         /* Allocate the application instance statically to prevent heap fragmentation */    \
