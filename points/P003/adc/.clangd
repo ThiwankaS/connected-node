@@ -1,0 +1,53 @@
+# ------------------------------------------------------------------------------
+# Project .clangd — embedded targets (ESP-IDF, ARM GCC, bare-metal)
+#
+# clangd indexes via compile_commands.json from the project build system.
+# Compiler paths and target flags originate from that database; this file
+# adjusts flags the clang frontend cannot parse and configures diagnostics.
+#
+# Prerequisites (global):
+#   CLANGD_QUERY_DRIVER — comma-separated globs for permitted *-gcc / *-g++
+#   drivers (required for cross-toolchain system headers).
+#
+# Prerequisites (repository):
+#   compile_commands.json at project root, or CompilationDatabase below.
+# ------------------------------------------------------------------------------
+
+# CompileFlags:
+#   CompilationDatabase: build
+
+CompileFlags:
+  # Flags removed from compile_commands.json entries before parsing.
+  # Prevents "Unknown argument" diagnostics and downstream type errors when
+  # the database contains GCC or vendor-specific options.
+  Remove:
+    # ESP-IDF / Xtensa / RISC-V
+    - -mlongcalls
+    - -mno-longcalls
+    - -mtext-section-literals
+    - -fno-caller-saves
+
+    # GCC-specific
+    - -fstrict-volatile-bitfields
+    - -fno-strict-volatile-bitfields
+    - -fno-tree-switch-conversion
+    - -fno-shrink-wrap
+
+    # Build metadata (not required for indexing)
+    - -fmacro-prefix-map=*
+    - -fdebug-prefix-map=*
+    - -fdiagnostics-color=*
+    - -fdiagnostics-color=always
+    - -fdiagnostics-color=never
+
+    # Linker arguments occasionally present in compile entries
+    - -Wl,*
+    - -T*
+    - -u*
+
+Diagnostics:
+  # Transitive includes from SDKs; strict unused-include checks add noise.
+  UnusedIncludes: None
+
+  # ClangTidy:
+  #   Remove: modernize-*, readability-identifier-length
